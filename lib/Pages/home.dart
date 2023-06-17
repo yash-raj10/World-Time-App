@@ -14,12 +14,12 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
 
-    data = ModalRoute.of(context)?.settings.arguments as Map ;
+    data = data.isNotEmpty ? data : ModalRoute.of(context)?.settings.arguments as Map ;
 
     print(data);
 
     // set background
-    String  bgImage = data['isDayTime'] ? 'day.jpg' : 'night.jpg' ;
+    String  bgImage = (data?['isDayTime'] ?? true) ? 'day.jpg' : 'night.jpg' ;
 
     return Scaffold(
       backgroundColor: Colors.white38,
@@ -35,27 +35,11 @@ class _HomeState extends State<Home> {
             padding: const EdgeInsets.fromLTRB(0,120.0,0,0),
             child: Column(
               children: [
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/locations');
-                  },
-                  icon: Icon(
-                    Icons.edit_location,
-                    color: Colors.black,
-                  ),
-                  label: Text(
-                      'Edit Location',
-                    style: TextStyle(
-                      color: Colors.indigoAccent,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      data['location'],
+                      data?['location'] as String ?? 'okie',
                       style: TextStyle(
                         fontSize: 35.0,
                         letterSpacing: 3.0,
@@ -72,7 +56,33 @@ class _HomeState extends State<Home> {
                     fontSize: 70.0,
                     color: Colors.grey[700],
                   ),
-                )
+                ),
+                SizedBox(height: 20.0),
+                TextButton.icon(
+                  onPressed: () async {
+                    dynamic result = await Navigator.pushNamed(context, '/locations');
+                    setState(() {
+                      data = {
+                        'time': result['result'],
+                        'location': result['location'],
+                        'isDaytime': result['result'],
+                        'flag': result['flag']
+                      };
+                    });
+                  },
+                  icon: Icon(
+                    Icons.edit_location,
+                    color: Colors.black,
+                  ),
+                  label: Text(
+                      'Change Location',
+                    style: TextStyle(
+                      color: Colors.indigoAccent,
+                    ),
+                  ),
+                ),
+
+
               ],
 
             ),
